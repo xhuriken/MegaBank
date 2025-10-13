@@ -37,9 +37,6 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-<<<<<<< HEAD
-    return {"message": "Bienvenue sur FastAPI!"}
-=======
     return {"message": "Bienvenue sur FastAPI!"}
 
 
@@ -82,4 +79,3 @@ def account_info(acc: Account):
 transit(5, account, account2)
 #python ça pu wallah
 print(account_info(account) , " | " , account_info(account2))
->>>>>>> main
