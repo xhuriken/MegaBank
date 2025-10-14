@@ -104,8 +104,7 @@ def withdraw(amount: float, iban: str):
 def transit(amount: float, sender: str, receiver: str):
     withdraw(amount, sender)
     deposit(amount, receiver)
-    # return {"Receiver": receiver.balance, "Sender" : sender.balance}
-    return {"C BON :)"}
+    return {"Receiver": get_balance(receiver), "Sender" : get_balance(sender)}
 
 @app.get("/me")
 def user_info(usrId: int):
