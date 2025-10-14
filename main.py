@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import TypedDict
-from sqlmodel import Field, SQLModel, Session, create_engine, select
+from random import*
 
 app = FastAPI()
 
@@ -32,6 +32,43 @@ class Account():
         self.balance = balance
         self.userId = userId
 
+class TransactionHistory():
+    date: str
+    amount: int
+    senderIban: str
+    receiverIban: str
+
+    def __init__(self,date,amount, senderIban, receiverIban):
+        self.date = date
+        self.amount = amount
+        self.senderIban = senderIban
+        self.receiverIban = receiverIban
+    
+    def __str__(self):
+        return {self.date,self,self.amount,self.senderIban,self.receiverIban}
+
+type Nationalities = {"FR","EN"}
+
+
+Transactions = []
+
+@app.get("/create_iban")
+def create_iban(nat: str):
+    iban: str
+    control_key = 00
+    megabank = 69420
+    tab = []
+    for i in range(100):    
+        iban.append(randrange(0,9,1))
+    rand: str = str(tab[0:5])
+    rand2: str = str(tab[5:10])
+    rand3: str = str(tab[11:22])
+    iban: str = "nat" , control_key , " " , megabank , " " , rand , " " , rand2 , " " , rand3
+    return iban
+
+
+
+
 users = {
     1 : User(1, "Jean", "1", "email"),
     2 : User(2, "Fabrice", "2", "email"),
@@ -50,6 +87,12 @@ def get_balance(iban: str):
         if(a.iban == iban):
             return {"solde":a.balance, "Iban" : iban}
     return "Iban ne exista"
+
+@app.get("/get_transactions")
+def get_transactions():
+    global Transactions
+    return Transactions
+
 
 
 @app.post("/deposit")
@@ -77,6 +120,8 @@ def withdraw(amount: float, iban: str):
 def transit(amount: float, sender: str, receiver: str):
     withdraw(amount, sender)
     deposit(amount, receiver)
+    TH = TransactionHistory("Todey",amount,sender,receiver)
+    Transactions.append(TH)
     return {"Receiver": get_balance(receiver), "Sender" : get_balance(sender)}
 
 @app.get("/me")
