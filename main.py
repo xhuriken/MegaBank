@@ -2,6 +2,9 @@ from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import TypedDict
 from sqlmodel import Field, SQLModel, Session, create_engine, select
+from utils import *
+from state import *
+from models import *
 
 app = FastAPI()
 
@@ -9,67 +12,42 @@ app = FastAPI()
 def read_root():
     return {"message": "Bienvenue sur FastAPI!"}
 
-class User():
-    id: int
-    firstName: str
-    lastName: str
-    email: str
-    password: str
 
-    def __init__(self, id, firstName, lastName, email,password):
-        self.id = id
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-        self.password = password
+@app.post("/open_account")
+def open_account(userId: int):
 
-class TransactionHistory():
-    date: str
-    amount: int
-    senderIban: str
-    receiverIban: str
+    #check if user exist
+    if userId not in users:
+        raise HTTPException(status_code=404, detail="Utilisateur inexistant")
 
-    def __init__(self,date,amount, senderIban, receiverIban):
-        self.date = date
-        self.amount = amount
-        self.senderIban = senderIban
-        self.receiverIban = receiverIban
-    
-    def __str__(self):
-        return {self.date,self,self.amount,self.senderIban,self.receiverIban}
+    balance = 0
+    nb_found_accounts = 0
+    isPrimary = False
 
-class Account():
-    iban: str
-    balance: float
-    userId: int
+    for i in accounts.values():
+        if i.userId == userId:
+            nb_found_accounts += 1
 
-    def __init__(self, iban, balance, userId):
-        self.iban = iban
-        self.balance = balance
-        self.userId = userId
+    if nb_found_accounts >= 5:
+        return {"message": "Arrête de créer des comptes t'en à déjà trop"}
 
-    def deposit(self, amount: float):
-        if amount <= 0:
-            raise ValueError("Amount need to be > 0")
-        self.balance += amount
+    if nb_found_accounts == 0:
+        balance = 100
+        isPrimary = True
 
-    def withdraw(self, amount: float):
-        if amount <= 0:
-            raise ValueError("Amount need to be > 0")
-        if self.balance < amount:
-            raise ValueError("Not enought bonk")
-        self.balance -= amount
-        
+    new_id = len(accounts) + 1
+    iban = f"FR {new_id}"
+    new_account = Account(iban, balance, isPrimary, userId)
+    accounts[iban] = new_account
 
-def get_acc(iban: str) -> Account:
-    acc = accounts.get(iban)
-    if not acc:
-        raise HTTPException(404, "Iban not found")
-    return acc
+    return {
+        "message": "Compte créé avec succès",
+        "id": new_id,
+        "iban": new_account.iban,
+        "balance": new_account.balance,
+        "userId": new_account.userId
+    }
 
-
-
-#MOVE in Utils class why not ?
 @app.get("/balance/{iban}")
 def get_balance(iban: str):
     acc = get_acc(iban)
@@ -98,14 +76,25 @@ def withdraw(iban: str, amount: float):
     return {"iban": acc.iban, "balance": acc.balance}
 
 
-#TODO adapt this for new archi
 @app.post("/transit")
-def transit(amount: float, sender: Account, receiver: Account):
-    withdraw(amount, sender)
-    deposit(amount, receiver)
-    TH = TransactionHistory("Todey",amount,sender,receiver)
-    Transactions.append(TH)
-    return {"Receiver": receiver.balance, "Sender" : sender.balance}
+def transit(amount: float, sender: str, receiver: str):
+    if sender == receiver:
+        raise HTTPException(400, "Sender and receiver must differ")
+    
+    s = get_acc(sender)
+    r = get_acc(receiver)
+
+    try:
+        s.withdraw(amount)
+        r.deposit(amount)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    
+    return {
+        "sender":   {"iban": s.iban, "balance": s.balance},
+        "receiver": {"iban": r.iban, "balance": r.balance},
+    }
+
 
 #GESTION USER
 
@@ -125,20 +114,25 @@ def account_info(iban: str):
     return {"Iban no exista"}
 
 
+@app.get("/create_beneficiary")
+def create_beneficiary(userid: int, name: str, iban: str):
+    if userid not in users:
+        raise HTTPException(status_code=404, detail=f"Utilisateur ID {userid} n'existe pas.")
 
-users = {
-    1 : User(1, "Jean", "1", "email","gyuezgef"),
-    2 : User(2, "Fabrice", "2", "email","giugyyig"),
-    3 : User(3, "test", "test", "email","huihuh"),
-}
+    iban_exists = any(a.iban == iban for a in accounts.values())
+    if not iban_exists:
+        raise HTTPException(status_code=400, detail=f"IBAN {iban} du bénéficiaire n'est pas un compte connu.")
 
-accounts = {
-    "FR 0" : Account("FR 0", 10, "email"),
-    "FR 1" : Account("FR 1", 100, "email"),
-    "FR 2" : Account("FR 2", 30, "email"),
-}
+    new_id = max(beneficiaries.keys()) + 1
 
-Transactions = []
+    new_beneficiary = Beneficiary(name=name, iban=iban, userid=userid)
+
+    beneficiaries[new_id] = new_beneficiary
+
+    return {
+        "message": f"Bénéficiaire '{name}' (IBAN: {iban}) ajouté pour l'utilisateur ID {userid}.",
+    }
+
 
 class UserBody(BaseModel):
     first_name: str
@@ -149,7 +143,7 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
-typeUserActual = None
+
 
 @app.post("/register")
 def register_user(user_data: UserBody):
@@ -157,22 +151,22 @@ def register_user(user_data: UserBody):
 
     for u in users.values():
         if u.email == user_data.email:
-            raise HTTPException(status_code=400, detail="Sa existe deja nullos")
+            raise HTTPException(status_code=400, detail="Email already exist")
 
     new_user = User(
-    id=new_id,
-    firstName=user_data.first_name,
-    lastName=user_data.last_name,
-    email=user_data.email,
-    password=user_data.password 
+        id=new_id,
+        firstName=user_data.first_name,
+        lastName=user_data.last_name,
+        email=user_data.email,
+        password=user_data.password 
     )
 
     users[new_id] = new_user
     return {
-    "message": "Tu existe maintenant",
-    "first_name": new_user.firstName,
-    "last_name": new_user.lastName
-}
+        "message": "New account created !",
+        "first_name": new_user.firstName,
+        "last_name": new_user.lastName
+    }
 
 @app.post("/login")
 def login_user(credentials: UserLogin):
@@ -183,8 +177,8 @@ def login_user(credentials: UserLogin):
             typeUserActual = u  
            
             return {
-                "message": f"Bienvenue {u.firstName}, t’es vraiment le GOAT !",
+                "message": f"Bienvenue {u.firstName}, You're connected",
                 "user": typeUserActual
             }
 
-    raise HTTPException(status_code=401, detail="Identifiants invalides")
+    raise HTTPException(status_code=401, detail="Bad credentials")
