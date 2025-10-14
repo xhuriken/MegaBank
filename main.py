@@ -23,6 +23,21 @@ class User():
         self.email = email
         self.password = password
 
+class TransactionHistory():
+    date: str
+    amount: int
+    senderIban: str
+    receiverIban: str
+
+    def __init__(self,date,amount, senderIban, receiverIban):
+        self.date = date
+        self.amount = amount
+        self.senderIban = senderIban
+        self.receiverIban = receiverIban
+    
+    def __str__(self):
+        return {self.date,self,self.amount,self.senderIban,self.receiverIban}
+
 class Account():
     iban: str
     balance: float
@@ -82,10 +97,14 @@ def withdraw(iban: str, amount: float):
         raise HTTPException(400, str(e))
     return {"iban": acc.iban, "balance": acc.balance}
 
+
+#TODO adapt this for new archi
 @app.post("/transit")
 def transit(amount: float, sender: Account, receiver: Account):
     withdraw(amount, sender)
     deposit(amount, receiver)
+    TH = TransactionHistory("Todey",amount,sender,receiver)
+    Transactions.append(TH)
     return {"Receiver": receiver.balance, "Sender" : sender.balance}
 
 #GESTION USER
@@ -119,7 +138,7 @@ accounts = {
     "FR 2" : Account("FR 2", 30, "email"),
 }
 
-
+Transactions = []
 
 class UserBody(BaseModel):
     first_name: str
