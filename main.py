@@ -110,8 +110,6 @@ def transit(amount: float, sender: str, receiver: str):
 def user_info(usrId: int):
     for i in users.values():
         if(i.id == usrId):
-            #Erreur avec le return (500) si je met return {"a"} pas d'erreur
-            # problème avec le users[usrId] ?
             return {"First Name: " : i.firstName, "Last Name" : i.lastName, "Email" : i.email}
     return {"user no exista"}    
     
