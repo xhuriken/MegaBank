@@ -28,11 +28,6 @@ tableau2con2 = {
 
 
 
-
-
-
-
-
 app = FastAPI()
 
 @app.get("/")
@@ -40,42 +35,96 @@ def read_root():
     return {"message": "Bienvenue sur FastAPI!"}
 
 
-class Account(BaseModel):
-    name: str
-    balance: float
+class User():
+    id: int
+    firstName: str
+    lastName: str
+    email: str
 
-account = Account(name="Fabrice", balance=100)
-account2 = Account(name="Eboue", balance=5)
+    def __init__(self, id, firstName, lastName, email):
+        self.id = id
+        self.firstName = firstName
+        self.lastName = lastName
+        self.email = email
+
+class Account():
+    iban: str
+    balance: float
+    userId: int
+
+    def __init__(self, iban, balance, userId):
+        # c'est pour la bdd ça self.id = id
+        self.iban = iban
+        self.balance = balance
+        self.userId = userId
+
+users = {
+    1 : User(1, "Jean", "1", "email"),
+    2 : User(2, "Fabrice", "2", "email"),
+    3 : User(3, "test", "test", "email"),
+}
+
+accounts = {
+    1 : Account("FR 0", 10, "email"),
+    2 : Account("FR 1", 100, "email"),
+    3 : Account("FR 2", 30, "email"),
+}
+
 
 @app.get("/get_balance")
-def get_balance(acc: Account):
-    return {"solde": acc.balance}
+def get_balance(iban: str):
+    for a in accounts.values():
+        if(a.iban == iban):
+            return {"solde":a.balance, "Iban" : iban}
+    return "Iban ne exista"
+
 
 @app.post("/deposit")
-def deposit(amount: float, acc: Account):
-    acc.balance += amount
-    return {"solde": acc.balance}
+def deposit(amount: float, iban: str):
+    for a in accounts.values():
+        if(a.iban == iban):
+            a.balance += amount
+            return {"solde": a.balance}
+    return {"Iban no exista"}
+
 
 @app.post("/withdraw")
-def withdraw(amount: float, acc: Account):
-    if(acc.balance < amount):
-        raise HTTPException(status_code=400, detail="T'a pas la thune")
-    else:
-        acc.balance -= amount
-    return {"solde": acc.balance}
+def withdraw(amount: float, iban: str):
+    for a in accounts.values():
+        if(a.iban == iban):
+            if(a.balance < amount):
+                raise HTTPException(status_code=400, detail="T'a pas la thune")
+            else:
+                a.balance -= amount
+            return {"solde": a.balance}
+    return {"Iban no exista"}
+
 
 @app.post("/transit")
-def transit(amount: float, sender: Account, receiver: Account):
+def transit(amount: float, sender: str, receiver: str):
     withdraw(amount, sender)
     deposit(amount, receiver)
-    return {"Receiver": receiver.balance, "Sender" : sender.balance}
+    # return {"Receiver": receiver.balance, "Sender" : sender.balance}
+    return {"C BON :)"}
 
 @app.get("/me")
-def account_info(acc: Account):
-    return {"Name: " : acc.name, "Balance" : acc.balance}
+def user_info(usrId: int):
+    for i in users.values():
+        if(i.id == usrId):
+            #Erreur avec le return (500) si je met return {"a"} pas d'erreur
+            # problème avec le users[usrId] ?
+            return {"First Name: " : i.firstName, "Last Name" : i.lastName, "Email" : i.email}
+    return {"user no exista"}    
+    
 
+@app.get("/account")
+def account_info(iban: str):
+    for a in accounts.values():
+        if(a.iban == iban):
+            return {"IBAN : " : iban, "Balance " : a.balance}
+    return {"Iban no exista"}
 
 #this working heoryaeporuhaer
-transit(5, account, account2)
-#python ça pu wallah
-print(account_info(account) , " | " , account_info(account2))
+# transit(5, account, account2)
+# print(account_info(account) , " \n " , account_info(account2))
+# print(user_info(userActual))
