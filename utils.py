@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from state import *
+from .state import *
 
 def get_acc(iban: str):
     acc = accounts.get(iban)

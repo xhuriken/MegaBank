@@ -1,4 +1,6 @@
-from models import *
+from .models.account import *
+from .models.user import *
+from .models.beneficiary import *
 
 users = {
     1 : User(1, "Jean", "1", "email","gyuezgef"),
