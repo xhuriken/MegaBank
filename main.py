@@ -29,7 +29,6 @@ class Account():
     userId: int
 
     def __init__(self, iban, balance, userId):
-        # c'est pour la bdd ça self.id = id
         self.iban = iban
         self.balance = balance
         self.userId = userId
