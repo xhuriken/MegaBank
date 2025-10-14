@@ -3,37 +3,11 @@ from pydantic import BaseModel
 from typing import TypedDict
 from sqlmodel import Field, SQLModel, Session, create_engine, select
 
-#pydantic gestion de model
-
-#GESTION DERREUR: raise HTTPException(status_code=400, detail="ERREUR")
-
-#Liste
-mon_tab = [5, 8, 6, 9]
-m = [[1, 3, 4],
-     [5, 6, 8],
-     [2, 1, 3],
-     [7, 8, 15]]
-
-#Dictionaire
-tableau = {
-    1: 50.0,
-    2: 3.0
-}
-#Dictionaire
-tableau2con2 = {
-    1: {"name": "Fabrice",      "id": 1},
-    2: {"name": "Emile louis",  "id": 2},
-    3: {"name": "éboué",        "id": 3},
-}
-
-
-
 app = FastAPI()
 
 @app.get("/")
 def read_root():
     return {"message": "Bienvenue sur FastAPI!"}
-
 
 class User():
     id: int
@@ -69,7 +43,6 @@ accounts = {
     2 : Account("FR 1", 100, "email"),
     3 : Account("FR 2", 30, "email"),
 }
-
 
 @app.get("/get_balance")
 def get_balance(iban: str):
@@ -120,8 +93,3 @@ def account_info(iban: str):
         if(a.iban == iban):
             return {"IBAN : " : iban, "Balance " : a.balance}
     return {"Iban no exista"}
-
-#this working heoryaeporuhaer
-# transit(5, account, account2)
-# print(account_info(account) , " \n " , account_info(account2))
-# print(user_info(userActual))
