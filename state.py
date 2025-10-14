@@ -23,3 +23,5 @@ beneficiaries = {
 
 Transactions = []
 typeUserActual = None
+
+
