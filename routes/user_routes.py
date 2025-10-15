@@ -1,24 +1,29 @@
 from fastapi import APIRouter, HTTPException
 from ..database import engine
 from sqlmodel import Session
-from ..state import users, typeUserActual
-from ..models.user import User, UserDB
+from ..datafile import users, typeUserActual
+from ..models.user import User
 from ..schemas.user_schema import UserBody, UserLogin
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
+
+#TODO Changer avec un get ??
+# il faut pouvoir mettre des param pour choisir le nom email etC...
+
+#TODO merge le token des zouzou kiki et loulou la
+#TODO Hash password
+
 @router.post("/register")
 def register_user(user_data: UserBody):
-  
     with Session(engine) as session:
-
      
-        existing_user = session.query(UserDB).filter(UserDB.email == user_data.email).first()
+        existing_user = session.query(User).filter(User.email == user_data.email).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already exists")
 
        
-        new_user = UserDB(
+        new_user = User(
             firstName=user_data.first_name,
             lastName=user_data.last_name,
             email=user_data.email,
@@ -41,14 +46,14 @@ def register_user(user_data: UserBody):
 @router.post("/login")
 def login_user(credentials: UserLogin):
     with Session(engine) as session:
-        user = session.query(UserDB).filter(UserDB.email == credentials.email).first()
+        user = session.query(User).filter(User.email == credentials.email).first()
         if not user:
             raise HTTPException(status_code=401, detail="Email not found")
 
-        if user.password != credentials.password:  # ⚠️ à hasher plus tard
+        if user.password != credentials.password:
             raise HTTPException(status_code=401, detail="Invalid password")
 
-        # Stocker l'utilisateur connecté (si tu veux garder ça)
+        # On utilisera plus ça je pense ? ou plus comme ça
         global typeUserActual
         typeUserActual = user
 
@@ -65,7 +70,10 @@ def login_user(credentials: UserLogin):
 @router.get("/me")
 def user_info(usrId: int):
     with Session(engine) as session:
-        user = session.get(UserDB, usrId)
+
+        #TODO recupérer uniqument les valeurs dont on a besoin pas TOUT le user
+
+        user = session.get(User, usrId)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return {
@@ -74,4 +82,3 @@ def user_info(usrId: int):
             "email": user.email
         }
 
- 

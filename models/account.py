@@ -1,42 +1,40 @@
-from typing import List, Optional
+from typing import Optional
+from enum import Enum
+from sqlmodel import Field, SQLModel
 
-from sqlmodel import Field, Relationship, SQLModel
+class State(str, Enum):
+    ACTIVE = "active"
+    CLOSED = "closed"
 
-
-
-class Account():
-    iban: str
-    balance: float
-    isPrimay: bool
-    userId: int
-
-    def __init__(self, iban, balance, isPrimay, userId):
-        self.iban = iban
-        self.balance = balance
-        self.isPrimay = isPrimay
-        self.userId = userId
+class Account(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    iban: str = Field(unique=True)
+    balance: int = 0
+    is_primary: bool = False
+    state: State = State.ACTIVE
+    user_id: int | None  = Field(default=None, foreign_key="user.id")
+    
+    def __init__(self, iban, balance, is_primary, state, user_id):
+            self.iban = iban
+            self.balance = balance
+            self.is_primary = is_primary
+            self.state = state
+            self.user_id = user_id
 
     def deposit(self, amount: float):
         if amount <= 0:
-            raise ValueError("Amount need to be > 0")
+            raise ValueError("Amount must be > 0")
         self.balance += amount
 
     def withdraw(self, amount: float):
         if amount <= 0:
-            raise ValueError("Amount need to be > 0")
+            raise ValueError("Amount must be > 0")
         if self.balance < amount:
-            raise ValueError("Not enought bonk")
+            raise ValueError("Not enough funds")
         self.balance -= amount
 
-class AccountDB(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    iban: str = Field(index=True, unique=True)
-    balance: float = 0
-    isPrimary: bool = False
 
-    user_id: Optional[int] = Field(default=None, foreign_key="userdb.id")
-
-    # user: Optional["UserBDD"] = Relationship(back_populates="accounts")
-    # sent_transactions: List["TransactionHistoryBDD"] = Relationship(back_populates="sender_account", sa_relationship_kwargs={"foreign_keys": "[TransactionHistoryBDD.sender_id]"})
-    # received_transactions: List["TransactionHistoryBDD"] = Relationship(back_populates="receiver_account", sa_relationship_kwargs={"foreign_keys": "[TransactionHistoryBDD.receiver_id]"})
-
+    #TODO: faire la route pour close un account d'un user !!
+    def close(self):
+        if self.state != State.CLOSED:
+            self.state = State.CLOSED
