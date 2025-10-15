@@ -1,11 +1,27 @@
+<<<<<<< HEAD
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import TypedDict
 from random import*
+=======
+from fastapi import FastAPI
+from .routes import account_routes, user_routes, transfer_routes, beneficiary_routes
+from .database import *
+>>>>>>> b5047bd26170b3af04a1bb1e872de3dd8c183628
 
-app = FastAPI()
+app = FastAPI(title="Mega Bank !")
+
+app.include_router(account_routes.router)
+app.include_router(user_routes.router)
+app.include_router(transfer_routes.router)
+app.include_router(beneficiary_routes.router)
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
 @app.get("/")
+<<<<<<< HEAD
 def read_root():
     return {"message": "Bienvenue sur FastAPI!"}
 
@@ -139,3 +155,7 @@ def account_info(iban: str):
         if(a.iban == iban):
             return {"IBAN : " : iban, "Balance " : a.balance}
     return {"Iban no exista"}
+=======
+def root():
+    return {"message": "Bienvenue sur FastAPI!"}
+>>>>>>> b5047bd26170b3af04a1bb1e872de3dd8c183628

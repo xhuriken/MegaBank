@@ -1,0 +1,29 @@
+#BDD
+users:
+- id pk
+- first_name
+- last_name
+- email
+- passwrd/token ?
+
+accounts:
+- id pk
+- user_id
+- iban
+- balance DEFAULT 0
+- is_primary DEFAULT FALSE | enum Active/Closed ?
+
+transactions:
+- id Pk
+- type | enum Depot transfert
+- amount
+- sender_id | NULLABLE
+- receiver_id | NOT NULL
+- note ? "argent pour bebe malade"
+
+beneficiaries:
+- id Pk
+- user_id
+- account_id
+- name
+
