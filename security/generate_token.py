@@ -8,7 +8,7 @@ algorithm = "HS256"
 
 def generate_token(user: User):
     payload = {
-        "userId": user.id,
+        "id": user.id,
     }
 
     #        "exp": datetime.utcnow() + datetime.timedelta(hours=24),

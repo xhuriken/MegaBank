@@ -1,4 +1,7 @@
+import jwt
 from fastapi import APIRouter, HTTPException, Depends
+
+from ..security.generate_token import generate_token
 from ..database import engine
 from sqlmodel import Session
 from ..datafile import users, typeUserActual
@@ -59,6 +62,8 @@ def login_user(credentials: UserLogin):
         global typeUserActual
         typeUserActual = user
 
+        token = generate_token(user)
+
         return {
             "message": f"Bienvenue {user.firstName}, you're connected!",
             "user": {
@@ -66,8 +71,27 @@ def login_user(credentials: UserLogin):
                 "firstName": user.firstName,
                 "lastName": user.lastName,
                 "email": user.email
-            }
+            },
+            "token": token
         }
+
+
+# @router.post("/login")
+# def login_user(credentials: UserLogin):
+#     global userAcutal
+#
+#     for u in users.values():
+#         if u.email == credentials.email and u.password == credentials.password:
+#             typeUserActual = u
+#             token = generate_token(u)
+#
+#             return {
+#                 "message": f"Bienvenue {u.firstName}, You're connected",
+#                 "user": typeUserActual,
+#                 "token": token
+#             }
+#
+#     raise HTTPException(status_code=401, detail="Bad credentials")
 
 @router.get("/me")
 def user_info(usrId: int):
@@ -87,5 +111,5 @@ def user_info(usrId: int):
 @router.get("/testtoken")
 def test_token(payload: dict = Depends(get_user)):
     print("Payload reçu :", payload)
-    user_id = payload["user_id"]
+    user_id = payload["userId"]
     return {"message": f"Bienvenue utilisateur {user_id}, ton token est valide"}
