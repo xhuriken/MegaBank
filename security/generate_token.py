@@ -10,6 +10,7 @@ def generate_token(user: User):
     payload = {
         "userId": user.id,
     }
+
     #        "exp": datetime.utcnow() + datetime.timedelta(hours=24),
 
     token = jwt.encode(payload, secret_key, algorithm=algorithm)
