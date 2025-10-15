@@ -13,7 +13,7 @@ class Beneficiary():
         self.userid = userid
 
 
-class BeneficiaryBDD(SQLModel, table=True):
+class BeneficiaryDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
     iban: str
