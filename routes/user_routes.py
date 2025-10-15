@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from ..state import *
 from ..models.user import User
 from ..schemas.user_schema import UserBody, UserLogin
 from ..security.generate_token import generate_token
+from ..security.verify_token import get_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -55,4 +56,9 @@ def user_info(usrId: int):
     return {
         "message": "user not found !"
     }
- 
+
+@router.get("/testtoken")
+def test_token(payload: dict = Depends(get_user)):
+    print("Payload reçu :", payload)
+    user_id = payload["user_id"]
+    return {"message": f"Bienvenue utilisateur {user_id}, ton token est valide"}
