@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from ..database import engine
 from sqlmodel import Session
 from ..datafile import users, typeUserActual
 from ..models.user import User
 from ..schemas.user_schema import UserBody, UserLogin
+from ..security.verify_token import get_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -83,3 +84,8 @@ def user_info(usrId: int):
             "email": user.email
         }
 
+@router.get("/testtoken")
+def test_token(payload: dict = Depends(get_user)):
+    print("Payload reçu :", payload)
+    user_id = payload["user_id"]
+    return {"message": f"Bienvenue utilisateur {user_id}, ton token est valide"}
