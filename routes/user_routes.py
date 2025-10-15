@@ -7,7 +7,7 @@ from sqlmodel import Session
 from ..datafile import users, typeUserActual
 from ..models.user import User
 from ..schemas.user_schema import UserBody, UserLogin
-from ..security.verify_token import get_user
+from ..security.verify_token import get_user, get_current_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -76,30 +76,14 @@ def login_user(credentials: UserLogin):
         }
 
 
-# @router.post("/login")
-# def login_user(credentials: UserLogin):
-#     global userAcutal
-#
-#     for u in users.values():
-#         if u.email == credentials.email and u.password == credentials.password:
-#             typeUserActual = u
-#             token = generate_token(u)
-#
-#             return {
-#                 "message": f"Bienvenue {u.firstName}, You're connected",
-#                 "user": typeUserActual,
-#                 "token": token
-#             }
-#
-#     raise HTTPException(status_code=401, detail="Bad credentials")
-
 @router.get("/me")
-def user_info(usrId: int):
+def user_info(current_user: User = Depends(get_current_user)):
     with Session(engine) as session:
 
         #TODO recupérer uniqument les valeurs dont on a besoin pas TOUT le user
 
-        user = session.get(User, usrId)
+        user = session.get(User, current_user.id)
+
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return {
@@ -111,5 +95,5 @@ def user_info(usrId: int):
 @router.get("/testtoken")
 def test_token(payload: dict = Depends(get_user)):
     print("Payload reçu :", payload)
-    user_id = payload["userId"]
+    user_id = payload["id"]
     return {"message": f"Bienvenue utilisateur {user_id}, ton token est valide"}
