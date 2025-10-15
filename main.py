@@ -55,18 +55,19 @@ Transactions = []
 @app.get("/create_iban")
 def create_iban(nat: str):
     iban: str
-    control_key = 00
-    megabank = 69420
-    tab = []
-    for i in range(100):    
-        iban.append(randrange(0,9,1))
-    rand: str = str(tab[0:5])
-    rand2: str = str(tab[5:10])
-    rand3: str = str(tab[11:22])
-    iban: str = "nat" , control_key , " " , megabank , " " , rand , " " , rand2 , " " , rand3
-    return iban
+    control_key = "00"
+    megabank = "69420"
+    rand: str = random_numbers(5)
+    rand2: str = random_numbers(5)
+    rand3: str = random_numbers(11)
+    iban: str = nat + control_key + " " + megabank + " " + rand + " " + rand2 + " " + rand3
+    return {iban}
 
-
+def random_numbers(amount: int):
+    rep = ""
+    for i in range(amount):
+        rep += str(randrange(0,9,1))
+    return rep
 
 
 users = {
