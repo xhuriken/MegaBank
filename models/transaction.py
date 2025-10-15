@@ -24,12 +24,11 @@ class TransactionHistory():
 
 class TransactionHistoryDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    type: TransactionType
-    amount: float
+    #type: TransactionType
+    amount: int
     note: Optional[str] = None
-
     sender_id: Optional[int] = Field(default=None, foreign_key="accountdb.id")
-    receiver_id: Optional[int] = Field(default6=None, foreign_key="accountdb.id")
+    receiver_id: Optional[int] = Field(default=None, foreign_key="accountdb.id")
 
     # sender_account: Optional["AccountBDD"] = Relationship(back_populates="sent_transactions", sa_relationship_kwargs={"foreign_keys": "[TransactionHistoryBDD.sender_id]"})
     # receiver_account: Optional["AccountBDD"] = Relationship(back_populates="received_transactions", sa_relationship_kwargs={"foreign_keys": "[TransactionHistoryBDD.receiver_id]"})

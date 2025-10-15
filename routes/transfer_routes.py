@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from ..utils import get_acc
+from ..models.transaction import*
 
 router = APIRouter(prefix="/transfers", tags=["Transfers"])
 

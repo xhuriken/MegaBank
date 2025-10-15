@@ -1,55 +1,77 @@
 from fastapi import APIRouter, HTTPException
+from ..database import engine
+from sqlmodel import Session
 from ..state import users, typeUserActual
-from ..models.user import User
+from ..models.user import User, UserDB
 from ..schemas.user_schema import UserBody, UserLogin
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("/register")
 def register_user(user_data: UserBody):
-    new_id = max(users.keys()) + 1
+  
+    with Session(engine) as session:
 
-    for u in users.values():
-        if u.email == user_data.email:
-            raise HTTPException(status_code=400, detail="Email already exist")
+     
+        existing_user = session.query(UserDB).filter(UserDB.email == user_data.email).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already exists")
 
-    new_user = User(
-        id=new_id,
-        firstName=user_data.first_name,
-        lastName=user_data.last_name,
-        email=user_data.email,
-        password=user_data.password 
-    )
+       
+        new_user = UserDB(
+            firstName=user_data.first_name,
+            lastName=user_data.last_name,
+            email=user_data.email,
+            password=user_data.password 
+        )
 
-    users[new_id] = new_user
-    return {
-        "message": "New account created !",
-        "first_name": new_user.firstName,
-        "last_name": new_user.lastName
-    }
+       
+        session.add(new_user)
+        session.commit()
+        session.refresh(new_user)  
+
+        return {
+            "message": "New account created!",
+            "user_id": new_user.id,
+            "first_name": new_user.firstName,
+            "last_name": new_user.lastName,
+            "email": new_user.email
+        }
 
 @router.post("/login")
 def login_user(credentials: UserLogin):
-    global userAcutal
+    with Session(engine) as session:
+        user = session.query(UserDB).filter(UserDB.email == credentials.email).first()
+        if not user:
+            raise HTTPException(status_code=401, detail="Email not found")
 
-    for u in users.values():
-        if u.email == credentials.email and u.password == credentials.password:
-            typeUserActual = u  
-           
-            return {
-                "message": f"Bienvenue {u.firstName}, You're connected",
-                "user": typeUserActual
+        if user.password != credentials.password:  # ⚠️ à hasher plus tard
+            raise HTTPException(status_code=401, detail="Invalid password")
+
+        # Stocker l'utilisateur connecté (si tu veux garder ça)
+        global typeUserActual
+        typeUserActual = user
+
+        return {
+            "message": f"Bienvenue {user.firstName}, you're connected!",
+            "user": {
+                "id": user.id,
+                "firstName": user.firstName,
+                "lastName": user.lastName,
+                "email": user.email
             }
-
-    raise HTTPException(status_code=401, detail="Bad credentials")
-
+        }
 
 @router.get("/me")
 def user_info(usrId: int):
-    for i in users.values():
-        if(i.id == usrId):
-            return {"First Name: " : i.firstName, "Last Name" : i.lastName, "Email" : i.email}
-    return {
-        "message": "user not found !"
-    }
+    with Session(engine) as session:
+        user = session.get(UserDB, usrId)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {
+            "firstName": user.firstName,
+            "lastName": user.lastName,
+            "email": user.email
+        }
+
  
