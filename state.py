@@ -12,13 +12,13 @@ accounts = {
     "FR 0" : Account("FR 020", 10,  True, 1),
     "FR 1" : Account("FR 102", 100, False, 1),
     "FR 2" : Account("FR 223", 30,  True, 2),
-    "FR 2" : Account("FR 223", 30,  True, 3),
+    "FR 3" : Account("FR 223", 30,  True, 3),
 }
 
 beneficiaries = {
     1: Beneficiary(name="Alice Amie", iban="FR 18974", userid=1),
     2: Beneficiary(name="Mon Compte Épargne", iban="FR 032523", userid=1),
-    2: Beneficiary(name="Bob Collègue", iban="FR 2352", userid=2)
+    3: Beneficiary(name="Bob Collègue", iban="FR 2352", userid=2)
 }
 
 Transactions = []

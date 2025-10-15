@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from ..state import users, typeUserActual
+from ..state import *
 from ..models.user import User
 from ..schemas.user_schema import UserBody, UserLogin
+from ..security.generate_token import generate_token
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -22,6 +23,7 @@ def register_user(user_data: UserBody):
     )
 
     users[new_id] = new_user
+
     return {
         "message": "New account created !",
         "first_name": new_user.firstName,
@@ -34,15 +36,16 @@ def login_user(credentials: UserLogin):
 
     for u in users.values():
         if u.email == credentials.email and u.password == credentials.password:
-            typeUserActual = u  
+            typeUserActual = u
+            token = generate_token(u)
            
             return {
                 "message": f"Bienvenue {u.firstName}, You're connected",
-                "user": typeUserActual
+                "user": typeUserActual,
+                "token": token
             }
 
     raise HTTPException(status_code=401, detail="Bad credentials")
-
 
 @router.get("/me")
 def user_info(usrId: int):
