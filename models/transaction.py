@@ -1,35 +1,30 @@
 from typing import List, Optional
 from sqlmodel import Enum, Field, Relationship, SQLModel
+from enum import Enum
+
+#TODO: Rename this class ? "transaction" ?
 
 class TransactionType(str, Enum):
     DEPOSIT = "deposit"
     WITHDRAW = "withdraw"
     TRANSFER = "transfer"
 
-class TransactionHistory():
-    date: str
-    amount: int
-    senderIban: str
-    receiverIban: str 
-
-    def __init__(self,date,amount, senderIban, receiverIban):
-        self.date = date
-        self.amount = amount
-        self.senderIban = senderIban
-        self.receiverIban = receiverIban
-    
-    def __str__(self):
-        return {self.date,self,self.amount,self.senderIban,self.receiverIban}
-
-
-class TransactionHistoryDB(SQLModel, table=True):
+class Transaction(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     type: TransactionType
-    amount: float
+    amount: int
     note: Optional[str] = None
 
-    sender_id: Optional[int] = Field(default=None, foreign_key="accountdb.id")
-    receiver_id: Optional[int] = Field(default6=None, foreign_key="accountdb.id")
+    sender_id: Optional[int] = Field(default=None, foreign_key="account.id")
+    receiver_id: Optional[int] = Field(default=None, foreign_key="account.id")
 
-    # sender_account: Optional["AccountBDD"] = Relationship(back_populates="sent_transactions", sa_relationship_kwargs={"foreign_keys": "[TransactionHistoryBDD.sender_id]"})
-    # receiver_account: Optional["AccountBDD"] = Relationship(back_populates="received_transactions", sa_relationship_kwargs={"foreign_keys": "[TransactionHistoryBDD.receiver_id]"})
+    def __init__(self,type,date,amount, note, sender_id, receiver_id):
+        self.type = type
+        self.date = date
+        self.amount = amount
+        self.note = note
+        self.sender_id = sender_id
+        self.receiver_id = receiver_id
+    
+    def __str__(self):
+        return {self.type,self.date,self,self.amount,self.note,self.sender_id,self.receiver_id}

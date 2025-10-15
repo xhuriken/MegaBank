@@ -1,6 +1,6 @@
 from random import randrange
 from fastapi import FastAPI, Depends, HTTPException
-from .state import *
+from .datafile import *
 
 def get_acc(iban: str):
     acc = accounts.get(iban)
@@ -16,7 +16,7 @@ def create_iban(nat: str):
     rand2: str = random_numbers(5)
     rand3: str = random_numbers(11)
     iban: str = nat + control_key + " " + megabank + " " + rand + " " + rand2 + " " + rand3
-    return {iban}
+    return iban
 
 def random_numbers(amount: int):
     rep = ""
