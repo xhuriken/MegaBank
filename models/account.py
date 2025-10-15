@@ -28,13 +28,13 @@ class Account():
             raise ValueError("Not enought bonk")
         self.balance -= amount
 
-class AccountBDD(SQLModel, table=True):
+class AccountDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     iban: str = Field(index=True, unique=True)
     balance: float = 0
     isPrimary: bool = False
 
-    user_id: Optional[int] = Field(default=None, foreign_key="userbdd.id")
+    user_id: Optional[int] = Field(default=None, foreign_key="userdb.id")
 
     # user: Optional["UserBDD"] = Relationship(back_populates="accounts")
     # sent_transactions: List["TransactionHistoryBDD"] = Relationship(back_populates="sender_account", sa_relationship_kwargs={"foreign_keys": "[TransactionHistoryBDD.sender_id]"})
