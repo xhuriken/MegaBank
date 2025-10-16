@@ -1,11 +1,13 @@
 from random import randrange
 from fastapi import FastAPI, Depends, HTTPException
-from .datafile import *
+
+
 from sqlmodel import Session, select
 from .database import engine
 
-def get_acc(iban: str) -> Account:
+def get_acc(iban: str):
     with Session(engine) as session:
+        from .models.account import Account
         statement = select(Account).where(Account.iban == iban)
         acc = session.exec(statement).first()
 
@@ -16,6 +18,7 @@ def get_acc(iban: str) -> Account:
 
 def get_user(user_id: int):
     with Session(engine) as session:
+        from .models.user import User
         statement = select(User).where(User.id == user_id)
         user = session.exec(statement).first()
 

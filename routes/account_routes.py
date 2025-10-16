@@ -3,7 +3,7 @@ from sqlmodel import Session
 
 from ..security.verify_token import get_current_user
 from ..models.user import User
-from ..tresitil import create_iban, get_acc
+from ..utils import create_iban, get_acc
 from ..database import engine
 from ..models.account import Account, State
 from datetime import date
@@ -13,6 +13,8 @@ router = APIRouter(prefix="/accounts", tags=["Accounts"])
 today = date.today()
 special_day = date(2025, 12, 25)
 #TODO when user is created, call open_account with his id
+
+
 
 @router.post("/open")
 def open_account(current_user: User = Depends(get_current_user)):

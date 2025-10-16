@@ -45,7 +45,7 @@ def register_user(user_data: UserBody):
         userlogin = UserLogin(email=user_data.email, password=user_data.password)
         
         login_user(userlogin)
-
+        
         # open_account(new_user.id)
 
         return {
@@ -68,7 +68,7 @@ def login_user(credentials: UserLogin):
             raise HTTPException(status_code=401, detail="Invalid password")
 
         token = generate_token(user)
-
+        print(token)
         return {
             "message": f"Bienvenue {user.firstName}, you're connected!",
             "user": {
