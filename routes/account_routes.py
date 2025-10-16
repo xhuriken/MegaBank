@@ -78,3 +78,34 @@ def account_info(iban: str):
     #TODO return account's user name ??
     # other infos too ?
     return {"iban": acc.iban, "balance": acc.balance}
+
+@router.delete("/del/{iban}")
+def del_account(iban: str, current_user: User = Depends(get_current_user)):
+    with Session(engine) as session:
+   
+        account = session.query(Account).filter(Account.iban == iban).first()
+
+        if account.is_primary:
+            raise HTTPException(status_code=404, detail="Account cant close because is primary")
+
+        if not account:
+            raise HTTPException(status_code=404, detail="Account not found")
+ 
+        if account.user_id != current_user.id:
+            raise HTTPException(status_code=403, detail="You are not allowed to close this account")
+     
+        if account.state == State.CLOSED:
+            raise HTTPException(status_code=400, detail="Account is already closed")
+
+        account.close()
+
+        session.add(account)
+        session.commit()
+        session.refresh(account)
+
+        return {
+            "message": f"Account {account.iban} closed successfully.",
+            "iban": account.iban,
+            "state": account.state
+        }
+
