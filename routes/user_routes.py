@@ -1,6 +1,7 @@
 import jwt
 from fastapi import APIRouter, HTTPException, Depends
 
+from ..security.hash_password import hash_password, verify_password
 from ..security.generate_token import generate_token
 from ..database import engine
 from sqlmodel import Session
@@ -16,8 +17,6 @@ router = APIRouter(prefix="/users", tags=["Users"])
 # il faut pouvoir mettre des param pour choisir le nom email etC...
 
 #TODO merge le token des zouzou kiki et loulou la
-#TODO Hash password
-
 @router.post("/register")
 def register_user(user_data: UserBody):
     with Session(engine) as session:
@@ -26,12 +25,11 @@ def register_user(user_data: UserBody):
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already exists")
 
-       
         new_user = User(
             firstName=user_data.first_name,
             lastName=user_data.last_name,
             email=user_data.email,
-            password=user_data.password 
+            password=hash_password(user_data.password),
         )
 
        
@@ -54,7 +52,7 @@ def login_user(credentials: UserLogin):
         if not user:
             raise HTTPException(status_code=401, detail="Email not found")
 
-        if user.password != credentials.password:
+        if not verify_password(credentials.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid password")
 
         # On utilisera plus ça je pense ? ou plus comme ça
