@@ -6,9 +6,12 @@ from ..models.user import User
 from ..utils import create_iban, get_acc
 from ..database import engine
 from ..models.account import Account, State
+from datetime import date
+
 
 router = APIRouter(prefix="/accounts", tags=["Accounts"])
-
+today = date.today()
+special_day = date(2025, 12, 25)
 #TODO when user is created, call open_account with his id
 
 @router.post("/open")
@@ -32,8 +35,12 @@ def open_account(current_user: User = Depends(get_current_user)):
             return {"message": "You can't have more than 5 account"}
 
         if nb_found_accounts == 0:
-            #TODO balance must be different with special date
-            balance = 100
+            
+            if today == special_day:
+                balance = 200
+            else:
+                balance = 100
+
             isPrimary = True
 
         #TODO REACT select nationality
