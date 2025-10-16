@@ -17,8 +17,6 @@ router = APIRouter(prefix="/users", tags=["Users"])
 # il faut pouvoir mettre des param pour choisir le nom email etC...
 
 #TODO merge le token des zouzou kiki et loulou la
-#TODO Hash password
-
 @router.post("/register")
 def register_user(user_data: UserBody):
     with Session(engine) as session:
@@ -27,7 +25,6 @@ def register_user(user_data: UserBody):
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already exists")
 
-       
         new_user = User(
             firstName=user_data.first_name,
             lastName=user_data.last_name,
