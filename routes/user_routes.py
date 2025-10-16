@@ -41,7 +41,12 @@ def register_user(user_data: UserBody):
         session.commit()
         session.refresh(new_user)
 
-        open_account(new_user.id)
+        
+        userlogin = UserLogin(email=user_data.email, password=user_data.password)
+        
+        login_user(userlogin)
+
+        # open_account(new_user.id)
 
         return {
             "message": "New account created!",
@@ -61,11 +66,6 @@ def login_user(credentials: UserLogin):
 
         if not verify_password(credentials.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid password")
-
-        # On utilisera plus ça je pense ? ou plus comme ça
-        # Il faut trouver un moyen pour que plus tard avec le front toute nos fonction utilise l'user id de l'user connecté mais il faut pas le stoquer dans le back genre
-        global typeUserActual
-        typeUserActual = user
 
         token = generate_token(user)
 
