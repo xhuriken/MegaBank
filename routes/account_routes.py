@@ -3,7 +3,7 @@ from sqlmodel import Session
 
 from ..security.verify_token import get_current_user
 from ..models.user import User
-from ..utils import create_iban, get_acc
+from ..tresitil import create_iban, get_acc
 from ..database import engine
 from ..models.account import Account, State
 from datetime import date
@@ -42,16 +42,16 @@ def open_account(current_user: User = Depends(get_current_user)):
                 balance = 100
 
             isPrimary = True
-
-        #TODO REACT select nationality
-        iban = create_iban("FR");
-        new_account = Account(iban, balance, isPrimary, State.ACTIVE, current_user.id)
+        
+        new_account = Account(balance, isPrimary, State.ACTIVE, current_user.id)
 
         session.add(new_account)
         session.commit()
         session.refresh(new_account)  
 
         return {"message": "Compte créé", "iban": new_account.iban, "balance": new_account.balance}
+    
+
 
 @router.get("/balance/{iban}")
 def get_balance(iban: str):
