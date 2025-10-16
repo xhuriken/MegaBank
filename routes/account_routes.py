@@ -34,16 +34,17 @@ def open_account(userId: int):
             #TODO balance must be different with special date
             balance = 100
             isPrimary = True
-
+        nat
         #TODO REACT select nationality
-        iban = create_iban("FR");
-        new_account = Account(iban, balance, isPrimary, State.ACTIVE, userId)
+        new_account = Account(nat, balance, isPrimary, State.ACTIVE, userId)
 
         session.add(new_account)
         session.commit()
         session.refresh(new_account)  
 
         return {"message": "Compte créé", "iban": new_account.iban, "balance": new_account.balance}
+    
+
 
 @router.get("/balance/{iban}")
 def get_balance(iban: str):

@@ -24,6 +24,7 @@ def register_user(user_data: UserBody):
 
        
         new_user = User(
+            nationality=user_data.first_name,
             firstName=user_data.first_name,
             lastName=user_data.last_name,
             email=user_data.email,
@@ -38,6 +39,7 @@ def register_user(user_data: UserBody):
         return {
             "message": "New account created!",
             "user_id": new_user.id,
+            "user_nationlity": new_user.nationality,
             "first_name": new_user.firstName,
             "last_name": new_user.lastName,
             "email": new_user.email
