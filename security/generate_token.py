@@ -8,7 +8,7 @@ algorithm = "HS256"
 
 def generate_token(user: User):
 
-    expire_at = datetime.now() + timedelta(minutes=5)
+    expire_at = datetime.now() + timedelta(minutes=60)
     now = datetime.utcnow()
 
     payload = {
