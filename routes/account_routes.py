@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session
 
+from ..security.verify_token import get_current_user
 from ..models.user import User
 from ..utils import create_iban, get_acc
 from ..database import engine
@@ -11,19 +12,19 @@ router = APIRouter(prefix="/accounts", tags=["Accounts"])
 #TODO when user is created, call open_account with his id
 
 @router.post("/open")
-def open_account(userId: int):
+def open_account(current_user: User = Depends(get_current_user)):
 
     with Session(engine) as session:
         
-        user = session.query(User).filter(User.id == userId).first()
+        user = session.query(User).filter(User.id == current_user.id).first()
         if not user:
             raise HTTPException(status_code=400, detail="User doesn't exist")
 
         balance = 0
-        nb_found_accounts = 0
+        # nb_found_accounts = 0
         isPrimary = False
 
-        accounts = session.query(Account).filter(Account.user_id == userId)
+        accounts = session.query(Account).filter(Account.user_id == current_user.id)
 
         nb_found_accounts = accounts.count()
 
@@ -37,7 +38,7 @@ def open_account(userId: int):
 
         #TODO REACT select nationality
         iban = create_iban("FR");
-        new_account = Account(iban, balance, isPrimary, State.ACTIVE, userId)
+        new_account = Account(iban, balance, isPrimary, State.ACTIVE, current_user.id)
 
         session.add(new_account)
         session.commit()
