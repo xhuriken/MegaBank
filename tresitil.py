@@ -1,12 +1,23 @@
 from random import randrange
 from fastapi import FastAPI, Depends, HTTPException
 from .datafile import *
+from sqlmodel import Session, select
+from .database import engine
 
 def get_acc(iban: str):
     acc = accounts.get(iban)
     if not acc:
         raise HTTPException(404, "Iban not found")
     return acc
+
+def get_user(user_id: int):
+    with Session(engine) as session:
+        statement = select(user).where(user.id == user_id)
+        user = session.exec(statement).first()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="user not found")
+    return user
 
 def create_iban(nat: str):
     iban: str

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import Session
 
 from ..models.user import User
-from ..utils import create_iban, get_acc
+from ..tresitil import create_iban, get_acc
 from ..database import engine
 from ..models.account import Account, State
 
@@ -34,9 +34,8 @@ def open_account(userId: int):
             #TODO balance must be different with special date
             balance = 100
             isPrimary = True
-        nat
-        #TODO REACT select nationality
-        new_account = Account(nat, balance, isPrimary, State.ACTIVE, userId)
+        
+        new_account = Account(balance, isPrimary, State.ACTIVE, userId)
 
         session.add(new_account)
         session.commit()

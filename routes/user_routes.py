@@ -4,6 +4,7 @@ from sqlmodel import Session
 from ..datafile import users, typeUserActual
 from ..models.user import User
 from ..schemas.user_schema import UserBody, UserLogin
+from ..routes.account_routes import open_account
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -22,7 +23,8 @@ def register_user(user_data: UserBody):
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already exists")
 
-       
+               #TODO REACT select nationality
+
         new_user = User(
             nationality=user_data.first_name,
             firstName=user_data.first_name,
@@ -34,7 +36,9 @@ def register_user(user_data: UserBody):
        
         session.add(new_user)
         session.commit()
-        session.refresh(new_user)  
+        session.refresh(new_user)
+
+        open_account(new_user.id)
 
         return {
             "message": "New account created!",

@@ -1,7 +1,8 @@
+from ..tresitil import create_iban
 from typing import Optional
 from enum import Enum
 from sqlmodel import Field, SQLModel
-from ..utils import*
+
 
 class State(str, Enum):
     ACTIVE = "active"
@@ -15,9 +16,8 @@ class Account(SQLModel, table=True):
     state: State = State.ACTIVE
     user_id: int | None  = Field(default=None, foreign_key="user.id")
     
-    def __init__(self, nat, balance, is_primary, state, user_id):
-            self.nat = get_acc(user_id).nat
-            self.iban = create_iban()
+    def __init__(self, balance, is_primary, state, user_id):
+            self.iban = create_iban(get_user(user_id).nationality)
             self.balance = balance
             self.is_primary = is_primary
             self.state = state
