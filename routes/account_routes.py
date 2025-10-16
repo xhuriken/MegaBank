@@ -1,38 +1,49 @@
 from fastapi import APIRouter, HTTPException
-from ..utils import get_acc
-from ..state import *
-from ..models.account import Account
+from sqlmodel import Session
+
+from ..models.user import User
+from ..utils import create_iban, get_acc
+from ..database import engine
+from ..models.account import Account, State
 
 router = APIRouter(prefix="/accounts", tags=["Accounts"])
+
+#TODO when user is created, call open_account with his id
 
 @router.post("/open")
 def open_account(userId: int):
 
-    #check if user exist
-    if userId not in users:
-        raise HTTPException(status_code=404, detail="Utilisateur inexistant")
+    with Session(engine) as session:
+        
+        user = session.query(User).filter(User.id == userId).first()
+        if not user:
+            raise HTTPException(status_code=400, detail="User doesn't exist")
 
-    balance = 0
-    nb_found_accounts = 0
-    isPrimary = False
+        balance = 0
+        nb_found_accounts = 0
+        isPrimary = False
 
-    for i in accounts.values():
-        if i.userId == userId:
-            nb_found_accounts += 1
+        accounts = session.query(Account).filter(Account.user_id == userId)
 
-    if nb_found_accounts >= 5:
-        return {"message": "Arrête de créer des comptes t'en à déjà trop"}
+        nb_found_accounts = accounts.count()
 
-    if nb_found_accounts == 0:
-        balance = 100
-        isPrimary = True
+        if nb_found_accounts >= 5:
+            return {"message": "You can't have more than 5 account"}
 
-    new_id = len(accounts) + 1
-    iban = f"FR {new_id}"
-    new_account = Account(iban, balance, isPrimary, userId)
-    accounts[iban] = new_account
+        if nb_found_accounts == 0:
+            #TODO balance must be different with special date
+            balance = 100
+            isPrimary = True
 
-    return {"message": "Compte créé", "iban": new_account.iban, "balance": new_account.balance}
+        #TODO REACT select nationality
+        iban = create_iban("FR");
+        new_account = Account(iban, balance, isPrimary, State.ACTIVE, userId)
+
+        session.add(new_account)
+        session.commit()
+        session.refresh(new_account)  
+
+        return {"message": "Compte créé", "iban": new_account.iban, "balance": new_account.balance}
 
 @router.get("/balance/{iban}")
 def get_balance(iban: str):
@@ -62,7 +73,7 @@ def withdraw(iban: str, amount: float):
 
 @router.get("/")
 def account_info(iban: str):
-    for a in accounts.values():
-        if(a.iban == iban):
-            return {"IBAN : " : iban, "Balance " : a.balance}
-    return {"erreur": "Account not found"}
+    acc = get_acc(iban)
+    #TODO return account's user name ??
+    # other infos too ?
+    return {"iban": acc.iban, "balance": acc.balance}
