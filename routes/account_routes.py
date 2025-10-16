@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session
 
+# from models import account
 from ..security.verify_token import get_current_user
 from ..models.user import User
 from ..utils import create_iban, get_acc
@@ -116,3 +117,23 @@ def del_account(iban: str, current_user: User = Depends(get_current_user)):
             "state": account.state
         }
 
+@router.get("/my_accounts")
+def get_user_accounts(current_user: User = Depends(get_current_user)):
+    with Session(engine) as session:
+        accounts = (
+            session.query(Account)
+            .filter(Account.user_id == current_user.id)
+            .all()
+        )
+
+        result = [
+            {
+                "iban": acc.iban,
+                "balance": acc.balance,
+                "state": acc.state,
+                "is_primary": acc.is_primary
+            }
+            for acc in accounts
+        ]
+
+        return {"user_id": current_user.id, "accounts": result}

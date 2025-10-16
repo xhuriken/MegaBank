@@ -16,7 +16,6 @@ router = APIRouter(prefix="/users", tags=["Users"])
 #TODO Changer avec un get ??
 # il faut pouvoir mettre des param pour choisir le nom email etC...
 
-#TODO merge le token des zouzou kiki et loulou la
 @router.post("/register")
 def register_user(user_data: UserBody):
     with Session(engine) as session:
@@ -55,11 +54,6 @@ def login_user(credentials: UserLogin):
         if not verify_password(credentials.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid password")
 
-        # On utilisera plus ça je pense ? ou plus comme ça
-        # Il faut trouver un moyen pour que plus tard avec le front toute nos fonction utilise l'user id de l'user connecté mais il faut pas le stoquer dans le back genre
-        global typeUserActual
-        typeUserActual = user
-
         token = generate_token(user)
 
         return {
@@ -77,8 +71,6 @@ def login_user(credentials: UserLogin):
 @router.get("/me")
 def user_info(current_user: User = Depends(get_current_user)):
     with Session(engine) as session:
-
-        #TODO recupérer uniqument les valeurs dont on a besoin pas TOUT le user
 
         user = session.get(User, current_user.id)
 
