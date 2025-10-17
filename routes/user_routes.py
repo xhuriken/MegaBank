@@ -9,6 +9,7 @@ from ..datafile import users, typeUserActual
 from ..models.user import User
 from ..schemas.user_schema import UserBody, UserLogin
 from ..security.verify_token import get_user, get_current_user
+from ..routes.account_routes import open_account
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -24,7 +25,10 @@ def register_user(user_data: UserBody):
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already exists")
 
+               #TODO REACT select nationality
+
         new_user = User(
+            nationality=user_data.nationality,
             firstName=user_data.first_name,
             lastName=user_data.last_name,
             email=user_data.email,
@@ -34,11 +38,19 @@ def register_user(user_data: UserBody):
        
         session.add(new_user)
         session.commit()
-        session.refresh(new_user)  
+        session.refresh(new_user)
+
+        
+        userlogin = UserLogin(email=user_data.email, password=user_data.password)
+        
+        login_user(userlogin)
+        
+        # open_account(new_user.id)
 
         return {
             "message": "New account created!",
             "user_id": new_user.id,
+            "user_nationlity": new_user.nationality,
             "first_name": new_user.firstName,
             "last_name": new_user.lastName,
             "email": new_user.email
@@ -55,7 +67,7 @@ def login_user(credentials: UserLogin):
             raise HTTPException(status_code=401, detail="Invalid password")
 
         token = generate_token(user)
-
+        print(token)
         return {
             "message": f"Bienvenue {user.firstName}, you're connected!",
             "user": {
