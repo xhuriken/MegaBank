@@ -29,7 +29,7 @@ def register_user(user_data: UserBody):
                #TODO REACT select nationality
 
         new_user = User(
-            nationality=user_data.first_name,
+            nationality=user_data.nationality,
             firstName=user_data.first_name,
             lastName=user_data.last_name,
             email=user_data.email,
