@@ -23,17 +23,41 @@ class Account(SQLModel, table=True):
             self.state = state
             self.user_id = user_id
 
-    def deposit(self, amount: float):
+    def deposit(self, amount: int):
         if amount <= 0:
             raise ValueError("Amount must be > 0")
         self.balance += amount
 
-    def withdraw(self, amount: float):
+    def withdraw(self, amount: int):
         if amount <= 0:
             raise ValueError("Amount must be > 0")
         if self.balance < amount:
             raise ValueError("Not enough funds")
         self.balance -= amount
+
+    def transit(self, amount: int, receiver: str):
+        if self.iban == receiver:
+            raise HTTPException(400, "Sender and receiver must differ")
+    
+        s: Account = self.iban
+        r: Account = get_acc(receiver)
+
+        s.withdraw(amount)
+        r.deposit(amount)
+
+        #TODO: save transition.
+        #TODO: fonction pour return 1 transaction précise
+        #TODO: function pour return toute les transaction d'un compte. (via iban dcp)
+        #TODO: bien differentier dépot, transaction, withdraw (Ne pas afficher withdraw dans les fonction toto a faire)
+        #TODO: Et ne pas record les transaction de withdraw et depost si elles sont utiliser pour une transition d'argent (ça ferai doublon)
+
+    
+        return {
+        "sender":   {"iban": s.iban, "balance": s.balance},
+        "receiver": {"iban": r.iban, "balance": r.balance},
+        }
+
+#TODO: pouvoir annuler les transaction !!!!!!!!!!!!!!!!
 
 
     #TODO: faire la route pour close un account d'un user !!
