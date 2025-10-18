@@ -2,11 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from decimal import Decimal
 from ..db.database import get_session
-from .users import get_current_user_uuid
+from ..core.auth import get_current_user_uuid
 from ..schemas.account import AccountCreate, AccountPublic
 from ..services.account_service import open_account, list_user_accounts, get_account_by_iban
 
-router = APIRouter(prefix="/accounts", tags=["accounts"])
+router = APIRouter(
+    prefix="/accounts",
+    tags=["accounts"]
+)
 
 @router.post("", response_model=AccountPublic, status_code=201)
 def create_account(body: AccountCreate, session: Session = Depends(get_session), user_uuid: str = Depends(get_current_user_uuid)):

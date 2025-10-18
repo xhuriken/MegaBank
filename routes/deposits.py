@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from ..db.database import get_session
-from .users import get_current_user_uuid
+from ..core.auth import get_current_user_uuid
 from ..schemas.deposit import DepositCreate
 from ..services.account_service import get_account_by_iban
 from ..services.deposit_service import make_deposit
