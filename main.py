@@ -1,18 +1,22 @@
 from fastapi import FastAPI
-from .routes import account_routes, user_routes, transfer_routes, beneficiary_routes
-from .database import *
+from .db.database import init_db
+from .routes.auth import router as auth_router
+from .routes.users import router as users_router
+from .routes.accounts import router as accounts_router
+from .routes.deposits import router as deposits_router
+from .routes.withdrawals import router as withdrawals_router
+from .routes.transactions import router as transactions_router
 
-app = FastAPI(title="Mega Bank !")
+app = FastAPI(title="MegaBank")
 
-app.include_router(account_routes.router)
-app.include_router(user_routes.router)
-app.include_router(transfer_routes.router)
-app.include_router(beneficiary_routes.router)
+# Enregistre les routes
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(accounts_router)
+app.include_router(deposits_router)
+app.include_router(withdrawals_router)
+app.include_router(transactions_router)
 
 @app.on_event("startup")
 def on_startup():
-    create_db_and_tables()
-
-@app.get("/")
-def root():
-    return {"message": "Bienvenue sur FastAPI!"}
+    init_db()
