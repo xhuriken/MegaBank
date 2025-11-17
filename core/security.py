@@ -19,11 +19,11 @@ def create_access_token(
     exp = now + timedelta(minutes=expires_minutes)
 
     payload: Dict[str, Any] = {
-        "sub": sub,            # ton user UUID
+        "sub": sub,            # user
         "iat": int(now.timestamp()),
         "exp": int(exp.timestamp()),
-        "iss": JWT_ISS,        # optionnel mais propre
-        "aud": JWT_AUD,        # optionnel
+        "iss": JWT_ISS,       
+        "aud": JWT_AUD,       
     }
     if scope:
         payload["scope"] = scope
@@ -39,8 +39,8 @@ def decode_token(token: str) -> dict:
         algorithms=[JWT_ALG],
         leeway=JWT_LEEWAY_SECONDS,
         options={"require": ["sub", "exp", "iat"]},
-        audience=JWT_AUD,   # commente si tu n’utilises pas aud
-        issuer=JWT_ISS,     # commente si tu n’utilises pas iss
+        audience=JWT_AUD,  
+        issuer=JWT_ISS,    
     )
 
 

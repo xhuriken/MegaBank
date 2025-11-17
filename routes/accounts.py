@@ -12,9 +12,22 @@ router = APIRouter(
 )
 
 @router.post("", response_model=AccountPublic, status_code=201)
-def create_account(body: AccountCreate, session: Session = Depends(get_session), user_uuid: str = Depends(get_current_user_uuid)):
-    acc = open_account(session, user_uuid=user_uuid, is_primary=body.is_primary)
-    return AccountPublic(iban=acc.iban, user_uuid=acc.user_uuid, balance=acc.balance, is_primary=acc.is_primary, state=acc.state.value)
+def create_account(
+    body: AccountCreate, 
+    session: Session = Depends(get_session), 
+    user_uuid: str = Depends(get_current_user_uuid)):
+    try:
+        acc = open_account(session, user_uuid=user_uuid, is_primary=body.is_primary)
+        return AccountPublic(
+            iban=acc.iban,
+            user_uuid=acc.user_uuid,
+            balance=acc.balance,
+            is_primary=acc.is_primary,
+            state=acc.state.value
+        )
+    except ValueError as e:
+        #  "Account limit reached (5)" or "User already has a primary account"
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("", response_model=list[AccountPublic])
 def my_accounts(session: Session = Depends(get_session), user_uuid: str = Depends(get_current_user_uuid)):
