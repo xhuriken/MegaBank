@@ -15,6 +15,10 @@ def create_access_token(
     *, sub: str, expires_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES,
     scope: Optional[str] = None, with_jti: bool = False
 ) -> str:
+    """
+    This builds a signed JWT for a user (sub).
+    We use it to authenticate API calls from clients.
+    """
     now = _utcnow()
     exp = now + timedelta(minutes=expires_minutes)
 
@@ -47,7 +51,15 @@ def decode_token(token: str) -> dict:
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
+    """
+    This hashes a plaintext password using passlib+bcrypt.
+    We use it when creating or updating a user's password.
+    """
     return pwd_context.hash(password)
 
 def verify_password(password: str, password_hash: str) -> bool:
+    """
+    This verifies a plaintext password against a stored hash.
+    We use it during login to validate credentials.
+    """
     return pwd_context.verify(password, password_hash)
