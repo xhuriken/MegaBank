@@ -28,13 +28,13 @@ app.add_middleware(
 
 # Enregistre les routes
 
-app.include_router(beneficiaries_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(accounts_router)
 app.include_router(deposits_router)
 app.include_router(withdrawals_router)
 app.include_router(transactions_router)
+app.include_router(beneficiaries_router)
 
 @app.on_event("startup")
 def on_startup():
