@@ -6,6 +6,7 @@ from .routes.accounts import router as accounts_router
 from .routes.deposits import router as deposits_router
 from .routes.withdrawals import router as withdrawals_router
 from .routes.transactions import router as transactions_router
+from .routes.beneficiaries import router as beneficiaries_router
 from fastapi.middleware.cors import CORSMiddleware 
 
 app = FastAPI(title="MegaBank")
@@ -26,6 +27,8 @@ app.add_middleware(
 )
 
 # Enregistre les routes
+
+app.include_router(beneficiaries_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(accounts_router)
