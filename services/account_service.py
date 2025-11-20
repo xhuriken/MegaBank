@@ -70,7 +70,10 @@ def get_account_by_iban(session: Session, iban: str) -> Account | None:
 def list_user_accounts(session: Session, user_uuid: str) -> Sequence[Account]:
     return session.exec(
         select(Account)
-        .where(Account.user_uuid == user_uuid)
+        .where(
+            Account.user_uuid == user_uuid,
+            Account.state != AccountState.CLOSED,  # on enlève les "closed"
+        )
         .order_by(desc(Account.created_at))
     ).all()
 
