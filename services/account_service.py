@@ -33,7 +33,8 @@ def open_account(
         *,
         user_uuid: str,
         is_primary: bool = False,
-        initial_balance: Decimal = Decimal("0.00")
+        initial_balance: Decimal = Decimal("0.00"),
+        account_name: str | None = None 
     ) -> Account:
 
     # max 5 account
@@ -43,7 +44,19 @@ def open_account(
     if is_primary and has_primary_account(session, user_uuid):
         raise ValueError("User already has a primary account")
 
-    account = Account(user_uuid=user_uuid, is_primary=is_primary, balance=initial_balance)
+    if is_primary:
+        final_name = "Compte courant"
+    else:
+        if not account_name:
+            raise ValueError("Account name is required for non-primary accounts")
+        final_name = account_name
+
+    account = Account(
+        user_uuid=user_uuid,
+        is_primary=is_primary,
+        balance=initial_balance,
+        name=final_name,
+    )
     session.add(account)
     session.commit()
     session.refresh(account)

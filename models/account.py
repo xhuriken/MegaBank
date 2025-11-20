@@ -18,3 +18,4 @@ class Account(SQLModel, table=True):
     is_primary: bool = False
     state: AccountState = AccountState.ACTIVE
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    name: str

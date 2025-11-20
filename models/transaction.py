@@ -9,3 +9,4 @@ class Transaction(SQLModel, table=True):
     target_iban: str = Field(foreign_key="account.iban", index=True)
     amount: Decimal
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    label: str | None = None

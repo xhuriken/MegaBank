@@ -27,6 +27,7 @@ def register(body: UserCreate, session: Session = Depends(get_session)):
             user_uuid=user.uuid,
             is_primary=True,
             initial_balance=Decimal("100.00"),
+            account_name=None
         )
 
         # Auto login
