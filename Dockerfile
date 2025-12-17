@@ -45,7 +45,7 @@ USER appuser
 COPY . .
 
 # Expose the port that the application listens on.
-EXPOSE 8080
+EXPOSE 8000
 
-# Run the application.
-CMD fastapi dev main.py
+# Run the application and tell to fast api to execute on 0 0 0 0 (else we cannot see the app on localhost:8000)
+CMD ["fastapi", "dev", "main.py", "--host", "0.0.0.0", "--port", "8000"]
