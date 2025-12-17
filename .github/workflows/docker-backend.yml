@@ -1,4 +1,4 @@
-name: Build & Push Backend Image (Docker Hub)
+name: Build and Push Backend Image (On DockerHub)
 
 on:
   push:
