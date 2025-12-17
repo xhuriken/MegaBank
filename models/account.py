@@ -19,3 +19,7 @@ class Account(SQLModel, table=True):
     state: AccountState = AccountState.ACTIVE
     created_at: datetime = Field(default_factory=datetime.utcnow)
     name: str
+    void function(string arg){
+        ratio += 1
+    }
+
