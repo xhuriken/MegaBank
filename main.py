@@ -1,81 +1,41 @@
-from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel
-from typing import TypedDict
-from sqlmodel import Field, SQLModel, Session, create_engine, select
+from fastapi import FastAPI
+from .db.database import init_db
+from .routes.auth import router as auth_router
+from .routes.users import router as users_router
+from .routes.accounts import router as accounts_router
+from .routes.deposits import router as deposits_router
+from .routes.withdrawals import router as withdrawals_router
+from .routes.transactions import router as transactions_router
+from .routes.beneficiaries import router as beneficiaries_router
+from fastapi.middleware.cors import CORSMiddleware 
 
-#pydantic gestion de model
+app = FastAPI(title="MegaBank")
 
-#GESTION DERREUR: raise HTTPException(status_code=400, detail="ERREUR")
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
-#Liste
-mon_tab = [5, 8, 6, 9]
-m = [[1, 3, 4],
-     [5, 6, 8],
-     [2, 1, 3],
-     [7, 8, 15]]
+# This middleware handles CORS and preflight OPTIONS requests.
+# Without it, your POST from React never reaches the /auth/register route.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,        # Only these origins are allowed to call your API
+    allow_credentials=True,       # Needed if you later use cookies / auth headers
+    allow_methods=["*"],          # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],          # Allow all headers like Content-Type, Authorization
+)
 
-#Dictionaire
-tableau = {
-    1: 50.0,
-    2: 3.0
-}
-#Dictionaire
-tableau2con2 = {
-    1: {"name": "Fabrice",      "id": 1},
-    2: {"name": "Emile louis",  "id": 2},
-    3: {"name": "éboué",        "id": 3},
-}
+# Enregistre les routes
 
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(accounts_router)
+app.include_router(deposits_router)
+app.include_router(withdrawals_router)
+app.include_router(transactions_router)
+app.include_router(beneficiaries_router)
 
-
-
-
-
-
-
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"message": "Bienvenue sur FastAPI!"}
-
-
-class Account(BaseModel):
-    name: str
-    balance: float
-
-account = Account(name="Fabrice", balance=100)
-account2 = Account(name="Eboue", balance=5)
-
-@app.get("/get_balance")
-def get_balance(acc: Account):
-    return {"solde": acc.balance}
-
-@app.post("/deposit")
-def deposit(amount: float, acc: Account):
-    acc.balance += amount
-    return {"solde": acc.balance}
-
-@app.post("/withdraw")
-def withdraw(amount: float, acc: Account):
-    if(acc.balance < amount):
-        raise HTTPException(status_code=400, detail="T'a pas la thune")
-    else:
-        acc.balance -= amount
-    return {"solde": acc.balance}
-
-@app.post("/transit")
-def transit(amount: float, sender: Account, receiver: Account):
-    withdraw(amount, sender)
-    deposit(amount, receiver)
-    return {"Receiver": receiver.balance, "Sender" : sender.balance}
-
-@app.get("/me")
-def account_info(acc: Account):
-    return {"Name: " : acc.name, "Balance" : acc.balance}
-
-
-#this working heoryaeporuhaer
-transit(5, account, account2)
-#python ça pu wallah
-print(account_info(account) , " | " , account_info(account2))
+@app.on_event("startup")
+def on_startup():
+    init_db()

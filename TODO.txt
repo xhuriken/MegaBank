@@ -1,0 +1,51 @@
+TODO
+
+DONE
+- Story 1: Inscription
+- Story 2: Connexion
+- Story 3: /users/me
+- Story 7: Virement
+
+TODO
+- Story 4: Ouvrir un compte
+  - Corriger le comptage des comptes (import func) pour limiter à 5 comptes par user
+
+- Story 5: Voir infos d’un compte
+  - Exposer created_at et infos complémentaires dans AccountPublic et dans les réponses des endpoints
+
+- Story 6: Dépôt d’argent
+  - Appliquer une limite de 2000€ par dépôt (contrôle + message d’erreur clair)
+
+- Story 8: Historique des transactions
+  - Endpoint /accounts/{iban}/transactions (tri desc)
+  - Pagination optionnelle (limit, offset)
+
+- Story 9: Voir mes comptes
+  - Ne pas afficher les comptes clos par défaut
+  - Paramètre include_closed pour les inclure si demandé
+
+- Story 10: Annuler une transaction
+  - Ajouter status de transaction (PENDING, CONFIRMED, CANCELED)
+  - Endpoint d’annulation < 5s par le propriétaire, si non confirmée
+  - Confirmation automatique après 5s
+
+- Story 11: Compte principal auto
+  - À l’inscription: créditer 200€ si le 25/12, sinon 100€
+
+- Story 12: Clôturer un compte
+  - Ajouter isClosed dans les schémas/réponses (ou le dériver de state)
+  - Bloquer toutes les opérations si compte clos (dépôt, retrait, virement, lecture)
+  - Masquer par défaut les comptes clos dans les listes (voir Story 9)
+
+- Story 13: Détail d’une transaction
+  - GET /transactions/{id} (accessible seulement si l’utilisateur est source ou cible)
+
+- Story 14: Ajouter un bénéficiaire
+  - Modèle Beneficiary (id, user_uuid, name, iban, created_at)
+  - POST /beneficiaries avec règles: IBAN non appartenant au user, IBAN de compte existant, unicité par user, name requis
+
+- Story 15: Lister mes bénéficiaires
+  - GET /beneficiaries (liste, tri desc, pagination optionnelle)
+
+TECH
+- Filtrer les comptes clos dans /accounts par défaut
