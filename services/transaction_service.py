@@ -1,7 +1,7 @@
 from sqlmodel import Session, select, desc
 from decimal import Decimal
-from ..models.account import Account
-from ..models.transaction import Transaction
+from models.account import Account
+from models.transaction import Transaction
 
 
 def transfer(

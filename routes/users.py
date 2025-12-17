@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel import Session
-from ..db.database import get_session
-from ..core.security import decode_token
-from ..core.auth import get_current_user
-from ..schemas.user import UserPublic
-from ..services.user_service import get_user_by_uuid
+from db.database import get_session
+from core.security import decode_token
+from core.auth import get_current_user
+from schemas.user import UserPublic
+from services.user_service import get_user_by_uuid
 
 router = APIRouter(prefix="/users", tags=["users"])
 

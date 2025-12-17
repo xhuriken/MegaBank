@@ -3,7 +3,7 @@ from sqlalchemy import func
 from typing import cast
 from decimal import Decimal
 from typing import Sequence, Tuple
-from ..models.account import Account, AccountState
+from models.account import Account, AccountState
 
 MAX_ACCOUNTS_PER_USER = 5
 

@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from ..models.beneficiary import Beneficiary
+from models.beneficiary import Beneficiary
 
 
 def create_beneficiary(

@@ -2,7 +2,7 @@ from sqlmodel import Column, Numeric, SQLModel, Field
 from decimal import Decimal
 from datetime import datetime
 from enum import Enum
-from ..core.identifiers import generate_iban
+from core.identifiers import generate_iban
 
 class AccountState(str, Enum):
     ACTIVE = "active"

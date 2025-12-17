@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field
-from ..core.identifiers import new_uuid
+from core.identifiers import new_uuid
 
 class User(SQLModel, table=True):
     uuid: str = Field(default_factory=new_uuid, primary_key=True, index=True)

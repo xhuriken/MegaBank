@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
-from ..models.user import User
+from models.user import User
 from sqlmodel import Session, select
-from ..models.user import User
-from ..core.security import hash_password, verify_password, create_access_token
+from models.user import User
+from core.security import hash_password, verify_password, create_access_token
 
 def register_user(session: Session, *, email: str, password: str, first_name: str, last_name: str) -> User:
     """

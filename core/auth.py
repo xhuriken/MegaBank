@@ -3,8 +3,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel import Session
 
 from .security import decode_token
-from ..db.database import get_session
-from ..services.user_service import get_user_by_uuid
+from db.database import get_session
+from services.user_service import get_user_by_uuid
 
 bearer_scheme = HTTPBearer()
 

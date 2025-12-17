@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field
 from decimal import Decimal
 from datetime import datetime
-from ..core.identifiers import new_uuid
+from core.identifiers import new_uuid
 
 class Transaction(SQLModel, table=True):
     id: str = Field(default_factory=new_uuid, primary_key=True)

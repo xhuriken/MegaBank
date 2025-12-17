@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field
 from datetime import datetime
-from ..core.identifiers import new_uuid
+from core.identifiers import new_uuid
 
 
 class Beneficiary(SQLModel, table=True):

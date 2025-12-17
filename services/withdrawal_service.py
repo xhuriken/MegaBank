@@ -1,7 +1,7 @@
 from sqlmodel import Session
 from decimal import Decimal
-from ..models.account import Account
-from ..models.withdrawal import Withdrawal
+from models.account import Account
+from models.withdrawal import Withdrawal
 
 def make_withdrawal(session: Session, *, iban: str, amount: Decimal) -> Withdrawal:
     acc = session.get(Account, iban)

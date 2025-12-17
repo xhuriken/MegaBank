@@ -1,10 +1,10 @@
 from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
-from ..db.database import get_session
-from ..services.user_service import register_user, authenticate_user
-from ..services.account_service import open_account
-from ..schemas.user import UserCreate, UserLogin, UserPublic, AuthResponse, Token
+from db.database import get_session
+from services.user_service import register_user, authenticate_user
+from services.account_service import open_account
+from schemas.user import UserCreate, UserLogin, UserPublic, AuthResponse, Token
 router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=AuthResponse, status_code=201)
 def register(body: UserCreate, session: Session = Depends(get_session)):

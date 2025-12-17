@@ -1,7 +1,7 @@
 from sqlmodel import Session
 from decimal import Decimal
-from ..models.account import Account
-from ..models.deposit import Deposit
+from models.account import Account
+from models.deposit import Deposit
 
 def make_deposit(session: Session, *, iban: str, amount: Decimal) -> Deposit:
     acc = session.get(Account, iban)

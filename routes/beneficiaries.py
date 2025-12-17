@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
-from ..db.database import get_session
-from ..core.auth import get_current_user_uuid
-from ..schemas.beneficiary import BeneficiaryCreate, BeneficiaryPublic
-from ..services.beneficiary_service import (
+from db.database import get_session
+from core.auth import get_current_user_uuid
+from schemas.beneficiary import BeneficiaryCreate, BeneficiaryPublic
+from services.beneficiary_service import (
     create_beneficiary,
     list_user_beneficiaries,
     delete_beneficiary,
