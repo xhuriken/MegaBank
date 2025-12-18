@@ -1,9 +1,7 @@
-#from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from main import app
 from core.auth import get_current_user
 
-#app = FastAPI()
 client = TestClient(app)
 
 class FakeUser:
