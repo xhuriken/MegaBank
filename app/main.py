@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from .db.database import init_db
-from .routes.auth import router as auth_router
-from .routes.users import router as users_router
-from .routes.accounts import router as accounts_router
-from .routes.deposits import router as deposits_router
-from .routes.withdrawals import router as withdrawals_router
-from .routes.transactions import router as transactions_router
-from .routes.beneficiaries import router as beneficiaries_router
+from app.db.database import init_db
+from app.routes.auth import router as auth_router
+from app.routes.users import router as users_router
+from app.routes.accounts import router as accounts_router
+from app.routes.deposits import router as deposits_router
+from app.routes.withdrawals import router as withdrawals_router
+from app.routes.transactions import router as transactions_router
+from app.routes.beneficiaries import router as beneficiaries_router
 from fastapi.middleware.cors import CORSMiddleware 
 
 app = FastAPI(title="MegaBank")
