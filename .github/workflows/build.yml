@@ -26,9 +26,10 @@ jobs:
       
       - name: Run tests with coverage
         run: |
-          pytest
+          pytest --cov=app --cov-report=xml --cov-report=term-missing
       
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@884b79409bbd464b2a59edc326a4b77dc56b2195  # v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
