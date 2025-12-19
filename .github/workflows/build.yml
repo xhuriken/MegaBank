@@ -1,4 +1,4 @@
-name: Scan SonarCube
+﻿name: Scan SonarCube
 on:
   push:
     branches:
@@ -8,28 +8,29 @@ on:
 jobs:
   sonarqube:
     name: SonarQube
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
       
       - name: Set up Python
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest pytest-cov
       
       - name: Run tests with coverage
         run: |
           pytest --cov=app --cov-report=xml --cov-report=term-missing
       
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@884b79409bbd464b2a59edc326a4b77dc56b2195  # v6.0.0
+        uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
